@@ -31,3 +31,22 @@ class HTMLNode:
       f'{self.children}, ' +
       f'{self.props})'
     )
+
+class LeafNode(HTMLNode):
+  # When tag is None, it will just be raw text
+  def __init__(
+      self, tag:str | None, value:str, 
+      props:dict[str, str] | None=None
+    ):
+    super().__init__(tag, value, None, props)
+
+  def to_html(self):
+    if self.value == None:
+      raise ValueError("Node must have a value")
+    
+    if self.tag == None:
+      return self.value
+    
+    return (
+      f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
+    )
