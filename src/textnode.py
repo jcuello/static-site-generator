@@ -10,7 +10,21 @@ class TextType(Enum):
   LINK = auto()
   IMAGE = auto()
 
+  @property
+  def delimiter(self) -> str | None:
+    match self.name:
+      case "TEXT":
+        return ""
+      case "BOLD":
+        return "**"
+      case "ITALIC":
+        return "_"
+      case "CODE":
+        return '`'
+      case _:
+        return None
 
+# This will be used for the markdown input
 class TextNode:
   def __init__(self, text:str, text_type:TextType, url:str=None):
     self.text = text
