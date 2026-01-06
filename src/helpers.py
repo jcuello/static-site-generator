@@ -91,7 +91,11 @@ def split_nodes_image(old_nodes:list[TextNode]) -> list[TextNode]:
         results.append(TextNode(before_target_text, TextType.TEXT))
         results.append(TextNode(image_alt, TextType.IMAGE, image_link))
         
-        node_text = sections[1]      
+        node_text = sections[1]
+
+      # add any remaining text
+      if len(node_text) > 0:
+        results.append(TextNode(node_text, TextType.TEXT))
 
       new_nodes.extend(results)
 
@@ -124,19 +128,23 @@ def split_nodes_link(old_nodes:list[TextNode]) -> list[TextNode]:
         results.append(TextNode(before_target_text, TextType.TEXT))
         results.append(TextNode(text_url, TextType.LINK, url))
         
-        node_text = sections[1]      
+        node_text = sections[1]
+
+      # add any remaining text
+      if len(node_text) > 0:
+        results.append(TextNode(node_text, TextType.TEXT))
 
       new_nodes.extend(results)
 
   return new_nodes
 
-# WIP
-# def text_to_textnodes(text:str) -> list[TextNode]:
-#   text_node = TextNode(text, TextType.TEXT)
-#   new_nodes = split_nodes_delimiter([text_node], TextType.BOLD.delimiter, TextType.BOLD)
-#   new_nodes = split_nodes_delimiter(new_nodes, TextType.ITALIC.delimiter, TextType.ITALIC)
-#   new_nodes = split_nodes_delimiter(new_nodes, TextType.CODE.delimiter, TextType.CODE)
-#   # review these two, they are leaving behind a text node
-#   new_nodes = split_nodes_image(new_nodes)
-#   new_nodes = split_nodes_link(new_nodes)
-#   return new_nodes
+
+def text_to_textnodes(text:str) -> list[TextNode]:
+  text_node = TextNode(text, TextType.TEXT)
+  new_nodes = split_nodes_delimiter([text_node], TextType.BOLD.delimiter, TextType.BOLD)
+  new_nodes = split_nodes_delimiter(new_nodes, TextType.ITALIC.delimiter, TextType.ITALIC)
+  new_nodes = split_nodes_delimiter(new_nodes, TextType.CODE.delimiter, TextType.CODE)
+  # review these two, they are leaving behind a text node
+  new_nodes = split_nodes_image(new_nodes)
+  new_nodes = split_nodes_link(new_nodes)
+  return new_nodes
