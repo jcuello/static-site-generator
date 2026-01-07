@@ -1,4 +1,4 @@
-from textnode import TextNode, TextType
+from textnode import BlockType, TextNode, TextType
 import re
 
 def split_nodes_delimiter(
@@ -144,7 +144,55 @@ def text_to_textnodes(text:str) -> list[TextNode]:
   new_nodes = split_nodes_delimiter([text_node], TextType.BOLD.delimiter, TextType.BOLD)
   new_nodes = split_nodes_delimiter(new_nodes, TextType.ITALIC.delimiter, TextType.ITALIC)
   new_nodes = split_nodes_delimiter(new_nodes, TextType.CODE.delimiter, TextType.CODE)
-  # review these two, they are leaving behind a text node
   new_nodes = split_nodes_image(new_nodes)
   new_nodes = split_nodes_link(new_nodes)
   return new_nodes
+
+def markdown_to_blocks(markdown:str) -> list[str]:
+  if markdown == None:
+    raise ValueError("markdown is required")
+  
+  blocks = markdown.split("\n\n")
+  result = []
+  for block in blocks:
+    block = block.strip()
+    if block != '':
+      result.append(block)
+
+  return result
+
+#TODO UNTESTED!! Need to write unit tests
+def block_to_block_type(markdown_block:str) -> BlockType:
+  if markdown_block == None:
+    raise ValueError("markdown_block required")
+  
+  if markdown_block.startswith("#"):
+    return BlockType.HEADING
+  
+  if markdown_block.startswith("```\n"):
+    return BlockType.CODE
+  
+  if markdown_block.startswith("> "):
+    return BlockType.QUOTE
+  
+  if markdown_block.startswith("- "):
+    return BlockType.UNORDERED_LIST
+  
+  if markdown_block[0].isdigit() and markdown_block[:2] == "1.":
+    lines = markdown_block.split("\n")
+    # is it a list if it's only one line?
+    if len(lines) > 1:
+      previous_num = 1      
+      for line in lines[1:]:
+        parsed_num = re.findall(r'(^\d+\.)', line)
+        if parsed_num == None or len(parsed_num) == 0:
+          return BlockType.PARAGRAPH
+        
+        if int(parsed_num) != previous_num+1:
+          return BlockType.PARAGRAPH
+        previous_num = parsed_num
+      
+      return BlockType.ORDERED_LIST
+  
+  return BlockType.PARAGRAPH
+

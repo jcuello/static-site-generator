@@ -23,6 +23,14 @@ class TextType(Enum):
         return '`'
       case _:
         return None
+      
+class BlockType(Enum):
+  PARAGRAPH = auto()
+  HEADING = auto()
+  CODE = auto()
+  QUOTE = auto()
+  UNORDERED_LIST = auto()
+  ORDERED_LIST = auto()
 
 # This will be used for the markdown input
 class TextNode:
