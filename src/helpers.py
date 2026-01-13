@@ -1,5 +1,6 @@
 from textnode import BlockType, TextNode, TextType
 import re
+import os
 
 def split_nodes_delimiter(
     old_nodes:list[TextNode], delimiter:str, text_type:TextType
@@ -161,35 +162,44 @@ def markdown_to_blocks(markdown:str) -> list[str]:
 
   return result
 
-#TODO UNTESTED!! Need to write unit tests
 def block_to_block_type(markdown_block:str) -> BlockType:
   if markdown_block == None:
     raise ValueError("markdown_block required")
   
-  if markdown_block.startswith("#"):
+  if markdown_block.startswith("# "):
     return BlockType.HEADING
   
-  if markdown_block.startswith("```\n"):
+  lines = []
+  for line in markdown_block.split(os.linesep):
+    line = line.strip()
+    if line != '':
+      lines.append(line)    
+
+  lines_len = len(lines)
+  if lines_len > 1 and lines[0].startswith("```") and lines[-1].endswith("```"):    
     return BlockType.CODE
   
-  if markdown_block.startswith("> "):
+  quote_lines = [line for line in lines if line.startswith("> ")]
+  if len(quote_lines) == lines_len:
     return BlockType.QUOTE
   
-  if markdown_block.startswith("- "):
+  unordered_lines = [line for line in lines if line.startswith("- ")]
+  if len(unordered_lines) == lines_len:
     return BlockType.UNORDERED_LIST
   
-  if markdown_block[0].isdigit() and markdown_block[:2] == "1.":
-    lines = markdown_block.split("\n")
-    # is it a list if it's only one line?
+  if lines[0][0].isdigit() and lines[0][:2] == "1.":
+    # is it a list if it's only one item?
     if len(lines) > 1:
-      previous_num = 1      
+      previous_num:int = 1      
       for line in lines[1:]:
-        parsed_num = re.findall(r'(^\d+\.)', line)
-        if parsed_num == None or len(parsed_num) == 0:
+        num_match = re.findall(r'(^\d+\.)', line)
+        if len(num_match) == 0:
           return BlockType.PARAGRAPH
         
-        if int(parsed_num) != previous_num+1:
+        parsed_num = int(float(num_match[0]))
+        if parsed_num != previous_num+1:
           return BlockType.PARAGRAPH
+        
         previous_num = parsed_num
       
       return BlockType.ORDERED_LIST

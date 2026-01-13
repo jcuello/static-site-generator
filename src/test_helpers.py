@@ -1,9 +1,10 @@
 import unittest
 from helpers import (
   split_nodes_delimiter, extract_markdown_images, extract_markdown_links,
-  split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks
+  split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks,
+  block_to_block_type
 )
-from textnode import TextNode, TextType
+from textnode import BlockType, TextNode, TextType
 
 class TestHelpers(unittest.TestCase):
   # split_nodes_delimiter tests
@@ -186,7 +187,43 @@ This is the same paragraph on a new line
             "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
             "- This is a list\n- with items",
         ],
-    )    
+    )
 
+  def test_block_to_block_type(self):    
+    heading_block ="# This is heading 1 block"
+    code_block = """```
+This is a code block.
+
+
+This is the second line in the block.
+
+
+And this is the third  ```  
+"""
+    quote_block="""
+> This is a quote block
+> This is the second line in the block
+> And the third
+"""
+    unordered_block = """
+- This is item one
+- This is item two
+- This is item three
+"""
+    ordered_block = """
+1. Item 1
+2. Item 2
+3. Item 3
+"""
+    paragraph_block = """
+Paragraph block, the next line should
+not make it something else.
+"""
+    self.assertEqual(block_to_block_type(heading_block), BlockType.HEADING)
+    self.assertEqual(block_to_block_type(code_block), BlockType.CODE)
+    self.assertEqual(block_to_block_type(quote_block), BlockType.QUOTE)
+    self.assertEqual(block_to_block_type(unordered_block), BlockType.UNORDERED_LIST)
+    self.assertEqual(block_to_block_type(ordered_block), BlockType.ORDERED_LIST)
+    self.assertEqual(block_to_block_type(paragraph_block), BlockType.PARAGRAPH)
 if __name__ == "__main__":
   unittest.main()
