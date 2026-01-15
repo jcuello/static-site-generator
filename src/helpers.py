@@ -1,4 +1,5 @@
-from textnode import BlockType, TextNode, TextType
+from htmlnode import HTMLNode, ParentNode
+from textnode import BlockType, TextNode, TextType, text_node_to_html_node
 import re
 import os
 
@@ -101,7 +102,6 @@ def split_nodes_image(old_nodes:list[TextNode]) -> list[TextNode]:
       new_nodes.extend(results)
 
   return new_nodes
-  
 
 def split_nodes_link(old_nodes:list[TextNode]) -> list[TextNode]:
   if old_nodes == None:
@@ -139,7 +139,6 @@ def split_nodes_link(old_nodes:list[TextNode]) -> list[TextNode]:
 
   return new_nodes
 
-
 def text_to_textnodes(text:str) -> list[TextNode]:
   text_node = TextNode(text, TextType.TEXT)
   new_nodes = split_nodes_delimiter([text_node], TextType.BOLD.delimiter, TextType.BOLD)
@@ -166,7 +165,8 @@ def block_to_block_type(markdown_block:str) -> BlockType:
   if markdown_block == None:
     raise ValueError("markdown_block required")
   
-  if markdown_block.startswith("# "):
+  heading_match:re.Match[str] = re.match(r"(^#+ )", markdown_block)
+  if heading_match != None:
     return BlockType.HEADING
   
   lines = []
@@ -187,7 +187,7 @@ def block_to_block_type(markdown_block:str) -> BlockType:
   if len(unordered_lines) == lines_len:
     return BlockType.UNORDERED_LIST
   
-  if lines[0][0].isdigit() and lines[0][:2] == "1.":
+  if lines[0][:2] == "1.":
     # is it a list if it's only one item?
     if len(lines) > 1:
       previous_num:int = 1      
@@ -206,3 +206,63 @@ def block_to_block_type(markdown_block:str) -> BlockType:
   
   return BlockType.PARAGRAPH
 
+def block_to_html_node(markdown_block:str) -> HTMLNode:
+  block_type = block_to_block_type(markdown_block)
+  text_nodes = text_to_textnodes(markdown_block)  
+  html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+  match block_type:
+    case BlockType.HEADING:
+      heading_size = min(6, len(markdown_block.split(" ", maxsplit=1)[0]))
+      html_nodes[0].value = html_nodes[0].value.replace("#", "").lstrip()
+      return ParentNode(f"h{heading_size}", html_nodes)
+    
+    case BlockType.CODE:
+      markdown_block = markdown_block.lstrip(f"```{os.linesep}").rstrip("```")
+      code_node_child = text_node_to_html_node(TextNode(markdown_block, TextType.TEXT))
+      return ParentNode("pre", [ParentNode("code", [code_node_child])])
+    
+    case BlockType.QUOTE:
+      for node in html_nodes:
+        node.value = node.value.replace("> ", "").replace(os.linesep, " ")
+      return ParentNode("blockquote", html_nodes)
+    
+    # Lists need special handling before sending it to text_to_textnodes since
+    # each node is a separate line, can't parse the whole text with newlines everywhere
+    case BlockType.UNORDERED_LIST:
+      text_nodes = [] 
+      for line in markdown_block.split(os.linesep):
+        line_nodes = text_to_textnodes(line)
+        text_nodes.extend(line_nodes)
+
+      html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+      for node in html_nodes:
+        node.value = node.value.lstrip("- ").replace(os.linesep, " ")
+      items = [ParentNode("li", [node]) for node in html_nodes]
+      return ParentNode("ul", items)
+    
+    case BlockType.ORDERED_LIST:
+      for node in html_nodes:
+        num_match = re.findall(r'(^\d+\.)', node.value)
+        if len(num_match) > 0:
+          node.value = node.value.lstrip(num_match[0]).replace(os.linesep, " ")
+
+      items = [HTMLNode("li", [node]) for node in html_nodes]
+      return ParentNode("ol", items)
+    
+    case _:
+      def remove_newlines(node:HTMLNode):
+        node.value = node.value.replace(os.linesep, " ") if node != None else None
+        return node
+      return ParentNode("p", list(map(remove_newlines, html_nodes)))
+
+def markdown_to_html_node(markdown:str) -> HTMLNode:
+  blocks = markdown_to_blocks(markdown)
+
+  if blocks == []:
+    return ParentNode("div", [])
+  
+  root_children: list[HTMLNode] = []
+  for block in blocks:
+    root_children.append(block_to_html_node(block))
+  
+  return ParentNode("div", root_children)
