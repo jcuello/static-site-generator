@@ -229,26 +229,29 @@ def block_to_html_node(markdown_block:str) -> HTMLNode:
     # Lists need special handling before sending it to text_to_textnodes since
     # each node is a separate line, can't parse the whole text with newlines everywhere
     case BlockType.UNORDERED_LIST:
-      text_nodes = [] 
+      # Need to group these per li
+      text_nodes: list[list[TextNode]] = [] 
       for line in markdown_block.split(os.linesep):
+        line = line.lstrip("- ")
         line_nodes = text_to_textnodes(line)
-        text_nodes.extend(line_nodes)
+        text_nodes.append(line_nodes)
+      
+      li_nodes: list[ParentNode] = []
+      for li_text_node in text_nodes:
+        li_nodes.append(ParentNode("li", [text_node_to_html_node(text_node) for text_node in li_text_node]))
 
-      html_nodes = [text_node_to_html_node(node) for node in text_nodes]
-      for node in html_nodes:
-        node.value = node.value.lstrip("- ").replace(os.linesep, " ")
-      items = [ParentNode("li", [node]) for node in html_nodes]
-      return ParentNode("ul", items)
+      return ParentNode("ul", li_nodes)
     
     case BlockType.ORDERED_LIST:
-      for node in html_nodes:
-        num_match = re.findall(r'(^\d+\.)', node.value)
-        if len(num_match) > 0:
-          node.value = node.value.lstrip(num_match[0]).replace(os.linesep, " ")
+      # for node in html_nodes:
+      #   num_match = re.findall(r'(^\d+\.)', node.value)
+      #   if len(num_match) > 0:
+      #     node.value = node.value.lstrip(num_match[0]).replace(os.linesep, " ")
 
-      items = [HTMLNode("li", [node]) for node in html_nodes]
-      return ParentNode("ol", items)
-    
+      # items = [HTMLNode("li", [node]) for node in html_nodes]
+      # return ParentNode("ol", items)
+      raise NotImplementedError("Ordered list is yet to be implemented.")
+      
     case _:
       def remove_newlines(node:HTMLNode):
         node.value = node.value.replace(os.linesep, " ") if node != None else None
