@@ -299,7 +299,23 @@ the **same** even with inline stuff
     self.assertEqual(
         html,
         "<div><ul><li>Unordered item 1</li><li>Unordered item 2 with <b>bold text</b></li><li>Unordered item 3 with <code>code</code> and <i>italics</i>!</li></ul></div>",
-    )    
+    )
+
+  def test_ordered_list(self):
+    md = """
+
+1. Ordered item 1
+2. Ordered item 2 with **bold text**
+3. Ordered item 3 with `code` and _italics_!
+
+"""
+
+    node = markdown_to_html_node(md)
+    html = node.to_html()
+    self.assertEqual(
+        html,
+        "<div><ol><li>Ordered item 1</li><li>Ordered item 2 with <b>bold text</b></li><li>Ordered item 3 with <code>code</code> and <i>italics</i>!</li></ol></div>",
+    )
 
 if __name__ == "__main__":
   unittest.main()
