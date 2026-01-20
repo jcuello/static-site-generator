@@ -1,13 +1,7 @@
-import textnode
-from textnode import TextType
+import sitehelpers
 
 def main():
-  text_node = textnode.TextNode(
-    "This is some anchor text", 
-    TextType.LINK, 
-    "https://www.boot.dev"
-  )
-  print(text_node)
+  sitehelpers.copy_dir("./static", "./public")
 
 if __name__ == "__main__":
   main()
