@@ -87,7 +87,10 @@ def split_nodes_image(old_nodes:list[TextNode]) -> list[TextNode]:
         sections = node_text.split(f"![{image_alt}]({image_link})", 1)
         before_target_text = sections[0]
 
+        # nothing else to process
         if before_target_text == '':
+          node_text = ""
+          results.append(TextNode(image_alt, TextType.IMAGE, image_link))
           break # breaks out of loop 2
 
         results.append(TextNode(before_target_text, TextType.TEXT))
@@ -123,7 +126,10 @@ def split_nodes_link(old_nodes:list[TextNode]) -> list[TextNode]:
         sections = node_text.split(f"[{text_url}]({url})", 1)
         before_target_text = sections[0]
 
+        # nothing else to process
         if before_target_text == '':
+          node_text = ""
+          results.append(TextNode(text_url, TextType.LINK, url))
           break # breaks out of loop 2
 
         results.append(TextNode(before_target_text, TextType.TEXT))
@@ -169,14 +175,13 @@ def block_to_block_type(markdown_block:str) -> BlockType:
   if heading_match != None:
     return BlockType.HEADING
   
-  lines = []
+  lines: list[str] = []
   for line in markdown_block.split(os.linesep):
-    line = line.strip()
-    if line != '':
+    if line.strip() != '':
       lines.append(line)    
 
   lines_len = len(lines)
-  if lines_len > 1 and lines[0].startswith("```") and lines[-1].endswith("```"):    
+  if lines_len > 1 and lines[0].startswith("```") and lines[-1].rstrip().endswith("```"):    
     return BlockType.CODE
   
   quote_lines = [line for line in lines if line.startswith("> ")]

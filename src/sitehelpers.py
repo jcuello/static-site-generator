@@ -1,5 +1,6 @@
 import os
 import shutil
+import helpers
 
 def copy_dir(src_path:str, dest_path:str, confirm_delete=False) -> None:
   abs_src_path, abs_dest_path = os.path.abspath(src_path), os.path.abspath(dest_path)
@@ -43,4 +44,34 @@ def copy_dir(src_path:str, dest_path:str, confirm_delete=False) -> None:
         copy_files(os.listdir(abs_item_src), abs_item_src, abs_item_dest)
 
   copy_files(os.listdir(abs_src_path), abs_src_path, abs_dest_path)
+
+def extract_title(markdown:str) -> str:
+  if  markdown == None or len(markdown) == 0:
+    raise ValueError("markdown is required")
+
+  if markdown.startswith("# "):
+    return markdown.split("\n")[0].lstrip("# ").rstrip()
+  
+  raise Exception("no header (h1) found")
+
+def generate_page(from_path:str, template_path:str, dest_path:str) -> None:
+  print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+  markdown: str = ""
+  with open(from_path) as f:
+    markdown = f.read()
+  
+  template: str = ""
+  with open(template_path) as f:
+    template = f.read()
+
+  html = helpers.markdown_to_html_node(markdown).to_html()
+  title_page = extract_title(markdown)
+  template = template.replace("{{ Title }}", title_page).replace("{{ Content }}", html)
+  dest_dir = os.path.dirname(dest_path)
+
+  if not os.path.exists(dest_dir):
+    os.makedirs(dest_dir)
+
+  with open(dest_path, "w") as f:
+    f.write(template)
 

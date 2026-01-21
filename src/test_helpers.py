@@ -219,8 +219,9 @@ And this is the third  ```
 Paragraph block, the next line should
 not make it something else.
 """
+    code_block = block_to_block_type(code_block)
     self.assertEqual(block_to_block_type(heading_block), BlockType.HEADING)
-    self.assertEqual(block_to_block_type(code_block), BlockType.CODE)
+    self.assertEqual(code_block, BlockType.CODE)
     self.assertEqual(block_to_block_type(quote_block), BlockType.QUOTE)
     self.assertEqual(block_to_block_type(unordered_block), BlockType.UNORDERED_LIST)
     self.assertEqual(block_to_block_type(ordered_block), BlockType.ORDERED_LIST)
