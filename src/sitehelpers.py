@@ -1,8 +1,9 @@
 import os
 import shutil
 import helpers
+from pathlib import Path
 
-def copy_dir(src_path:str, dest_path:str, confirm_delete=False) -> None:
+def copy_dir(src_path:str, dest_path:str, confirm_delete=True) -> None:
   abs_src_path, abs_dest_path = os.path.abspath(src_path), os.path.abspath(dest_path)
   if not os.path.exists(abs_src_path):
     raise Exception(f"source path '{abs_src_path}' does not exist")
@@ -54,7 +55,7 @@ def extract_title(markdown:str) -> str:
   
   raise Exception("no header (h1) found")
 
-def generate_page(from_path:str, template_path:str, dest_path:str) -> None:
+def generate_page(from_path:str, template_path:str, dest_path:str, basepath="/") -> None:
   print(f"Generating page from {from_path} to {dest_path} using {template_path}")
   markdown: str = ""
   with open(from_path) as f:
@@ -67,6 +68,7 @@ def generate_page(from_path:str, template_path:str, dest_path:str) -> None:
   html = helpers.markdown_to_html_node(markdown).to_html()
   title_page = extract_title(markdown)
   template = template.replace("{{ Title }}", title_page).replace("{{ Content }}", html)
+  template = template.replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
   dest_dir = os.path.dirname(dest_path)
 
   if not os.path.exists(dest_dir):
@@ -75,3 +77,12 @@ def generate_page(from_path:str, template_path:str, dest_path:str) -> None:
   with open(dest_path, "w") as f:
     f.write(template)
 
+def generate_pages_recursive(dir_path_content:str, template_path:str, dest_dir_path:str, basepath="/"):
+  content_dir = Path(dir_path_content)
+  for item in content_dir.rglob("*"):
+    abs_item_path = str(item.resolve())
+    if os.path.isfile(abs_item_path):
+      #TODO: Fix this (eventually), it works but there has to be a better way??
+      root_content_dir = os.path.dirname(str(item)).replace(dir_path_content, "./")
+      abs_dest_path = os.path.abspath(os.path.join(dest_dir_path, root_content_dir, f"{item.stem}.html"))
+      generate_page(abs_item_path, template_path, abs_dest_path, basepath)
