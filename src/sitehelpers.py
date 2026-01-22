@@ -13,7 +13,7 @@ def copy_dir(src_path:str, dest_path:str, confirm_delete=True) -> None:
   
   if confirm_delete:
     while True:
-      confirm_deletion = input(f"Do you want to delete ALL contents in directory '{abs_dest_path}'? (y/N) ").strip()
+      confirm_deletion = input(f"Do you want to delete ALL contents in directory '{abs_dest_path}'? (y/n) ").strip()
       if len(confirm_deletion) == 0:
         continue
       
