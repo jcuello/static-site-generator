@@ -23,7 +23,7 @@ def copy_dir(src_path:str, dest_path:str, confirm_delete=True) -> None:
 
       if first_letter == 'n':
         print("Cancelled deletion, aborting!")
-        exit()
+        exit(1)
   
   if os.path.exists(abs_dest_path):
     if not os.path.isdir(abs_dest_path):

@@ -1,130 +1,191 @@
-body {
-  background-color: #1f1c25;
-  color: #f0e6d1;
-  font-family: "Luminari", "Georgia", serif;
-  line-height: 1.7;
-  margin: 0;
-  padding: 20px;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+ }
 
-b {
-  font-weight: 900;
-}
+html {
+    overflow-y: scroll;
+    height: 100%;
+    font: 100%/1.5 sans-serif;
+    word-wrap: break-word;
+    margin: 0 auto;
+    padding: 1.5em;
+ }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: #dda15e;
-  margin-top: 24px;
-  margin-bottom: 16px;
-  text-shadow: 2px 2px 4px #000;
-}
+@media (min-width: 768px) {
+    html {
+        font-size: 125%;
+        max-width: 42em;
+ } }
 
-h1 {
-  font-size: 2.5em;
-}
-
-h2 {
-  font-size: 2em;
-}
-
-h3 {
-  font-size: 1.5em;
-}
-
-h4,
-h5,
-h6 {
-  font-size: 1.2em;
-}
+h1, h2, h3, h4 {
+    margin: 2.5rem 0 1.5rem 0;
+    line-height: 1.25;
+    color: #333;
+ }
 
 a {
-  color: #e0a96d;
-  text-decoration: none;
-  border-bottom: 2px solid #e0a96d;
-}
+    color: #fa6432;
+    text-decoration: none;
+ }
+a:hover, a:focus, a:active {
+    text-decoration: underline;
+ }
 
-a:hover {
-  color: #f4a261;
-  border-color: #f4a261;
-}
+p {
+    margin: 1em 0;
+    line-height: 1.5;
+ }
+p code {
+    background-color: #eee;
+    padding: 0.05em 0.2em;
+    border: 1px solid #ccc;
+ }
 
-ul,
-ol {
-  padding-left: 30px;
-}
+ol, ul {
+    margin: 1em;
+ }
+ol li ol, ol li ul, ul li ol, ul li ul {
+    margin: 0 2em;
+ }
+ol li p, ul li p {
+    margin: 0;
+ }
 
-code {
-  background-color: #3c3c42;
-  border-radius: 6px;
-  color: #e9c46a;
-  padding: 0.4em 0.6em;
-  font-family: "Courier New", monospace;
-}
-
-pre code {
-  padding: 0;
-}
-
-pre {
-  background-color: #3c3c42;
-  border-radius: 6px;
-  padding: 1em;
-  overflow: auto;
-  box-shadow: 2px 2px 6px #000;
-}
-
-blockquote {
-  background-color: #2e2c35;
-  border-left: 4px solid #8d99ae;
-  padding-left: 2em;
-  margin-left: 0;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  padding-right: 0.5em;
-  color: #ddd;
-  font-style: italic;
-}
+dl {
+    font-family: monospace, monospace;
+ }
+dl dt {
+    font-weight: bold;
+ }
+dl dd {
+    margin: -1em 0 1em 1em;
+ }
 
 img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-  border: 3px solid #3c3c42;
-  box-shadow: 3px 3px 6px #000;
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+    padding: 0.5em;
+ }
+
+blockquote {
+    padding-left: 1em;
+    font-style: italic;
+    border-left: solid 1px #fa6432;
+ }
+
+table {
+    font-size: 1rem;
+    text-align: left;
+    caption-side: bottom;
+    margin-bottom: 2em;
+ }
+table * {
+    border: none;
+ }
+table thead, table tr {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+ }
+table tr:nth-child(even) {
+    background-color: rgba(200, 200, 200, 0.2);
+ }
+table tbody {
+    display: block;
+    max-height: 70vh;
+    overflow-y: auto;
+ }
+table td, table th {
+    padding: 0.25em;
+ }
+
+table, .highlight > pre, pre.example {
+    max-height: 70vh;
+    margin: 1em 0;
+    padding: 1em;
+    overflow: auto;
+    font-size: 0.85rem;
+    font-family: monospace, monospace;
+    border: 1px dashed rgba(250, 100, 50, 0.5);
 }
 
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+.title {
+    font-size: 2.5em;
 }
 
-::-webkit-scrollbar-track {
-  background: #1f1c25;
-  border-radius: 6px;
+.subtitle {
+    font-weight: normal;
+    font-size: 0.75em;
+    color: #666;
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: #3c3c42;
-  border-radius: 6px;
-  border: 3px solid #1f1c25;
+.tags {
+    margin-top: -1.5rem;
+    padding-bottom: 1.5em;
+}
+.tags li {
+    display: inline;
+    margin-right: 0.5em;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: #5a5466;
+figure {
+    margin: 1em 0;
+}
+figure figcaption {
+    font-family: monospace, monospace;
+    font-size: 0.75em;
+    text-align: center;
+    color: grey;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #3c3c42 #1f1c25;
+.footnote-definition sup {
+    margin-left: -1.5em;
+    float: left;
 }
 
-::-webkit-scrollbar-corner {
-  background: #1f1c25;
+.footnote-definition .footnote-body {
+    margin: 1em 0;
+    padding: 0 1em;
+    border: 1px dashed rgba(250, 100, 50, 0.3);
+    background-color: rgba(200, 200, 200, 0.2);
+}
+.footnote-definition .footnote-body p:only-child {
+    margin: 0.2em 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+}
+header nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+header a + a {
+    margin-left: 1rem;
+}
+
+.posts {
+    margin: 0;
+    list-style: none;
+}
+.posts .post a {
+    display: flex;
+    padding: 0.5em 0;
+    color: black;
+}
+.posts .post a:hover, .posts .post a:focus, .posts .post a:active {
+    text-decoration: none;
+    background: rgba(200, 200, 200, 0.2);
+}
+.posts .post date {
+    font-family: monospace, monospace;
+    font-size: 0.8rem;
+    vertical-align: middle;
+    padding-right: 2rem;
+    color: grey;
 }
